@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>USLE Soil Loss Calculator</title>
+  <style>
+    body { font-family: Arial; margin: 20px; max-width: 600px; }
+    label { display: block; margin-top: 10px; }
+    input, select { width: 100%; padding: 5px; margin-top: 5px; }
+    button { margin-top: 15px; padding: 10px; font-weight: bold; }
+    #result { margin-top: 20px; font-size: 1.2em; }
+  </style>
+</head>
+<body>
+  <h2>Universal Soil Loss Equation Calculator</h2>
+
+  <label>Rainfall Erosivity (R):</label>
+  <input type="number" id="r" step="any">
+
+  <label>Soil Texture:</label>
+  <select id="texture">
+    <option value="0.28">Sand</option>
+    <option value="0.32">Loamy Sand</option>
+    <option value="0.37">Sandy Loam</option>
+    <option value="0.35">Loam</option>
+    <option value="0.4">Silt Loam</option>
+    <option value="0.3">Clay Loam</option>
+    <option value="0.25">Clay</option>
+  </select>
+
+  <label>% Organic Matter:</label>
+  <input type="number" id="om" step="any" min="0" max="10">
+
+  <label>Slope Length (ft):</label>
+  <input type="number" id="slopeLength" step="any">
+
+  <label>Slope Steepness (%):</label>
+  <input type="number" id="slopeSteepness" step="any">
+
+  <label>Cover & Management Factor (C):</label>
+  <input type="number" id="c" step="any" min="0" max="1">
+
+  <label>Support Practice Factor (P):</label>
+  <input type="number" id="p" step="any" min="0" max="1">
+
+  <button onclick="calculateUSLE()">Calculate Soil Loss</button>
+
+  <div id="result"></div>
+
+  <script>
+    function calculateUSLE() {
+      const R = parseFloat(document.getElementById('r').value);
+      const textureK = parseFloat(document.getElementById('texture').value);
+      const OM = parseFloat(document.getElementById('om').value);
+      const slopeLength = parseFloat(document.getElementById('slopeLength').value);
+      const slopeSteepness = parseFloat(document.getElementById('slopeSteepness').value);
+      const C = parseFloat(document.getElementById('c').value);
+      const P = parseFloat(document.getElementById('p').value);
+
+      // Estimate K (basic adjustment for organic matter)
+      const K = textureK - (OM * 0.005);  // Slightly reduce K with more organic matter
+
+      // Estimate LS Factor using simplified formula (Wischmeier & Smith)
+      const m = slopeSteepness < 1 ? 0.2 : slopeSteepness < 3 ? 0.3 : slopeSteepness < 5 ? 0.4 : 0.5;
+      const L = Math.pow(slopeLength / 72.6, m);
+      const S = slopeSteepness < 9 ? 0.6 + 0.4 * slopeSteepness : 1.5 * slopeSteepness / 100 + 0.5;
+      const LS = L * S;
+
+      const A = R * K * LS * C * P;
+
+      document.getElementById('result').innerHTML = 
+        `<strong>Estimated Soil Loss:</strong> ${A.toFixed(2)} tons/acre/year`;
+    }
+  </script>
+</body>
+</html>
