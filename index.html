@@ -23,7 +23,12 @@
     <option value="0.37">Sandy Loam</option>
     <option value="0.35">Loam</option>
     <option value="0.4">Silt Loam</option>
-    <option value="0.3">Clay Loam</option>
+    <option value="0.42">Silt</option>
+    <option value="0.3">Sandy Clay Loam</option>
+    <option value="0.31">Clay Loam</option>
+    <option value="0.33">Silty Clay Loam</option>
+    <option value="0.28">Sandy Clay</option>
+    <option value="0.27">Silty Clay</option>
     <option value="0.25">Clay</option>
   </select>
 
@@ -36,11 +41,27 @@
   <label>Slope Steepness (%):</label>
   <input type="number" id="slopeSteepness" step="any">
 
-  <label>Cover & Management Factor (C):</label>
-  <input type="number" id="c" step="any" min="0" max="1">
+  <label>Cover & Management Practice (C-Factor):</label>
+  <select id="cover">
+    <option value="1.0">Bare Soil (C = 1.0)</option>
+    <option value="0.5">Row Crops, Conventional Tillage (C = 0.5)</option>
+    <option value="0.3">Row Crops, No-Till (C = 0.3)</option>
+    <option value="0.2">Small Grains (C = 0.2)</option>
+    <option value="0.01">Established Grass or Pasture (C = 0.01)</option>
+    <option value="0.003">Forest (C = 0.003)</option>
+    <option value="0.05">Cover Crop (C = 0.05)</option>
+    <option value="0.001">Mulched Permanent Cover (C = 0.001)</option>
+  </select>
 
-  <label>Support Practice Factor (P):</label>
-  <input type="number" id="p" step="any" min="0" max="1">
+  <label>Support Practice (P-Factor):</label>
+  <select id="pFactor">
+    <option value="1.0">No Conservation Practice (P = 1.0)</option>
+    <option value="0.6">Contour Farming (P = 0.6)</option>
+    <option value="0.5">Contour Strip Cropping (P = 0.5)</option>
+    <option value="0.3">Terracing (P = 0.3)</option>
+    <option value="0.2">Contour + Strip Cropping + Terracing (P = 0.2)</option>
+    <option value="0.1">Permanent Vegetative Cover (P = 0.1)</option>
+  </select>
 
   <button onclick="calculateUSLE()">Calculate Soil Loss</button>
 
@@ -53,13 +74,13 @@
       const OM = parseFloat(document.getElementById('om').value);
       const slopeLength = parseFloat(document.getElementById('slopeLength').value);
       const slopeSteepness = parseFloat(document.getElementById('slopeSteepness').value);
-      const C = parseFloat(document.getElementById('c').value);
-      const P = parseFloat(document.getElementById('p').value);
+      const C = parseFloat(document.getElementById('cover').value);
+      const P = parseFloat(document.getElementById('pFactor').value);
 
-      // Estimate K (basic adjustment for organic matter)
-      const K = textureK - (OM * 0.005);  // Slightly reduce K with more organic matter
+      // Adjust K for organic matter
+      const K = textureK - (OM * 0.005);
 
-      // Estimate LS Factor using simplified formula (Wischmeier & Smith)
+      // Estimate LS Factor
       const m = slopeSteepness < 1 ? 0.2 : slopeSteepness < 3 ? 0.3 : slopeSteepness < 5 ? 0.4 : 0.5;
       const L = Math.pow(slopeLength / 72.6, m);
       const S = slopeSteepness < 9 ? 0.6 + 0.4 * slopeSteepness : 1.5 * slopeSteepness / 100 + 0.5;
